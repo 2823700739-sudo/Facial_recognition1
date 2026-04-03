@@ -1,0 +1,10 @@
+release/face_in.o
+release/main.o
+release/login.o
+release/main_win.o
+release/register_win.o
+release/qrc_image.o
+release/moc_face_in.o
+release/moc_login.o
+release/moc_main_win.o
+release/moc_register_win.o

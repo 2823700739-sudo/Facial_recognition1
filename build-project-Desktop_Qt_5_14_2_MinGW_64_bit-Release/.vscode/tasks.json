@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "build_release",
+			"type": "shell",
+			"command": "mingw32-make",
+			"isBackground": false,
+			"group": "build"
+		}
+	]
+}

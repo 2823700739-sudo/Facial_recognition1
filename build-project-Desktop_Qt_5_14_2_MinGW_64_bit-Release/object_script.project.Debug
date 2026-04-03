@@ -1,0 +1,10 @@
+debug/face_in.o
+debug/main.o
+debug/login.o
+debug/main_win.o
+debug/register_win.o
+debug/qrc_image.o
+debug/moc_face_in.o
+debug/moc_login.o
+debug/moc_main_win.o
+debug/moc_register_win.o

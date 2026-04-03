@@ -33,7 +33,7 @@ IDC           = idc
 IDL           = midl
 ZIP           = zip -r -9
 DEF_FILE      = 
-RES_FILE      = 
+RES_FILE      = project_resource_res.o
 SED           = $(QMAKE) -install sed
 MOVE          = move
 SUBTARGETS    =  \
@@ -223,6 +223,7 @@ Makefile: ../project/project.pro ../../../QT/5.14.2/mingw73_64/mkspecs/win32-g++
 		../../../QT/5.14.2/mingw73_64/mkspecs/features/qt_config.prf \
 		../../../QT/5.14.2/mingw73_64/mkspecs/win32-g++/qmake.conf \
 		../../../QT/5.14.2/mingw73_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		../../../QT/5.14.2/mingw73_64/mkspecs/features/exclusive_builds.prf \
 		../../../QT/5.14.2/mingw73_64/mkspecs/features/toolchain.prf \
 		../../../QT/5.14.2/mingw73_64/mkspecs/features/default_pre.prf \
@@ -247,12 +248,16 @@ Makefile: ../project/project.pro ../../../QT/5.14.2/mingw73_64/mkspecs/win32-g++
 		../../../QT/5.14.2/mingw73_64/mkspecs/features/yacc.prf \
 		../../../QT/5.14.2/mingw73_64/mkspecs/features/lex.prf \
 		../project/project.pro \
+		../../../QT/5.14.2/mingw73_64/lib/Qt5MultimediaWidgets.prl \
 		../../../QT/5.14.2/mingw73_64/lib/Qt5Widgets.prl \
+		../../../QT/5.14.2/mingw73_64/lib/Qt5Multimedia.prl \
 		../../../QT/5.14.2/mingw73_64/lib/Qt5Gui.prl \
+		../../../QT/5.14.2/mingw73_64/lib/Qt5Sql.prl \
+		../../../QT/5.14.2/mingw73_64/lib/Qt5Network.prl \
 		../../../QT/5.14.2/mingw73_64/lib/Qt5Core.prl \
 		../../../QT/5.14.2/mingw73_64/lib/qtmain.prl \
-		.qmake.stash \
-		../../../QT/5.14.2/mingw73_64/mkspecs/features/build_pass.prf
+		../../../QT/5.14.2/mingw73_64/mkspecs/features/build_pass.prf \
+		../project/image.qrc
 	$(QMAKE) -o Makefile ..\project\project.pro -spec win32-g++ "CONFIG+=qtquickcompiler"
 ../../../QT/5.14.2/mingw73_64/mkspecs/features/spec_pre.prf:
 ../../../QT/5.14.2/mingw73_64/mkspecs/qdevice.pri:
@@ -407,6 +412,7 @@ Makefile: ../project/project.pro ../../../QT/5.14.2/mingw73_64/mkspecs/win32-g++
 ../../../QT/5.14.2/mingw73_64/mkspecs/features/qt_config.prf:
 ../../../QT/5.14.2/mingw73_64/mkspecs/win32-g++/qmake.conf:
 ../../../QT/5.14.2/mingw73_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 ../../../QT/5.14.2/mingw73_64/mkspecs/features/exclusive_builds.prf:
 ../../../QT/5.14.2/mingw73_64/mkspecs/features/toolchain.prf:
 ../../../QT/5.14.2/mingw73_64/mkspecs/features/default_pre.prf:
@@ -431,12 +437,16 @@ Makefile: ../project/project.pro ../../../QT/5.14.2/mingw73_64/mkspecs/win32-g++
 ../../../QT/5.14.2/mingw73_64/mkspecs/features/yacc.prf:
 ../../../QT/5.14.2/mingw73_64/mkspecs/features/lex.prf:
 ../project/project.pro:
+../../../QT/5.14.2/mingw73_64/lib/Qt5MultimediaWidgets.prl:
 ../../../QT/5.14.2/mingw73_64/lib/Qt5Widgets.prl:
+../../../QT/5.14.2/mingw73_64/lib/Qt5Multimedia.prl:
 ../../../QT/5.14.2/mingw73_64/lib/Qt5Gui.prl:
+../../../QT/5.14.2/mingw73_64/lib/Qt5Sql.prl:
+../../../QT/5.14.2/mingw73_64/lib/Qt5Network.prl:
 ../../../QT/5.14.2/mingw73_64/lib/Qt5Core.prl:
 ../../../QT/5.14.2/mingw73_64/lib/qtmain.prl:
-.qmake.stash:
 ../../../QT/5.14.2/mingw73_64/mkspecs/features/build_pass.prf:
+../project/image.qrc:
 qmake: FORCE
 	@$(QMAKE) -o Makefile ..\project\project.pro -spec win32-g++ "CONFIG+=qtquickcompiler"
 

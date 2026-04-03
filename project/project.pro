@@ -1,4 +1,5 @@
 QT       += core gui widgets sql multimedia
+QT       += core gui multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,20 +16,39 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-INCLUDEPATH += d:/four_project/Facial_recognition/OpenCV-MinGW-Build-OpenCV-4.5.5-x64/include
-LIBS += -Ld:/four_project/Facial_recognition/OpenCV-MinGW-Build-OpenCV-4.5.5-x64/x64/mingw/lib -lopencv_core455 -lopencv_imgproc455 -lopencv_objdetect455 -lopencv_highgui455 -lopencv_videoio455
+INCLUDEPATH += d:/four_project/Facial_recognition/opencv-SeetaFace-qt5.14.0minGW/opencv452/include \
+               d:/four_project/Facial_recognition/opencv-SeetaFace-qt5.14.0minGW/SeetaFace/include
+
+LIBS += -Ld:/four_project/Facial_recognition/opencv-SeetaFace-qt5.14.0minGW/opencv452/x64/mingw/lib \
+        -lopencv_core452 -lopencv_imgproc452 -lopencv_imgcodecs452 -lopencv_objdetect452 -lopencv_highgui452 -lopencv_videoio452 \
+        -Ld:/four_project/Facial_recognition/opencv-SeetaFace-qt5.14.0minGW/SeetaFace/bin \
+        -lSeetaFaceDetector -lSeetaFaceLandmarker -lSeetaFaceRecognizer -lSeetaFaceTracker -lSeetaNet -lSeetaQualityAssessor
 
 SOURCES += \
+    face_in.cpp \
     main.cpp \
-    login.cpp
+    login.cpp \
+    main_win.cpp \
+    register_win.cpp
 
 HEADERS += \
-    login.h
+    face_in.h \
+    login.h \
+    main_win.h \
+    register_win.h
 
 FORMS += \
-    login.ui
+    face_in.ui \
+    login.ui \
+    main_win.ui \
+    register_win.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    image.qrc
+# Windows 可执行文件 + 任务栏图标
+RC_ICONS = $$PWD/image/logo.ico

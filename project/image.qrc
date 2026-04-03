@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>image/logo.png</file>
+        <file>image/logo.ico</file>
+        <file>E:/doubao_download/background_image.png</file>
+        <file>image/unlock.png</file>
+        <file>image/lock.png</file>
+        <file>image/serach.png</file>
+        <file>image/save.png</file>
+    </qresource>
+</RCC>
