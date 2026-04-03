@@ -37,6 +37,11 @@ private:
     int current_edit_note_id;
 
     void loadUserNotes();
+    
+    // 锁定蒙版指针
+    class QWidget *maskWidget = nullptr;
+    // 解锁按钮槽函数
+    void on_unlock_clicked();
 };
 
 #endif // MAIN_WIN_H

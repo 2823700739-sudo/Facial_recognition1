@@ -2,13 +2,54 @@
 #include "ui_login.h"
 #include <QDebug>
 #include <QSqlError>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+
+// 静态成员初始化
+QTcpSocket* login::clientSocket = nullptr;
+
+QJsonObject login::sendSyncRequest(const QJsonObject &request)
+{
+    if (!clientSocket || clientSocket->state() != QAbstractSocket::ConnectedState) {
+        return QJsonObject();
+    }
+    
+    QByteArray sendData = QJsonDocument(request).toJson(QJsonDocument::Compact);
+    clientSocket->write(sendData);
+    clientSocket->flush();
+
+    // 简单粗暴的同步等待包回发机制
+    if (clientSocket->waitForReadyRead(3000)) {
+        QByteArray recvData = clientSocket->readAll();
+        return QJsonDocument::fromJson(recvData).object();
+    }
+    
+    return QJsonObject();
+}
 
 login::login(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::login)
 {
     ui->setupUi(this);
 
-    // 安装数据库驱动
+    // 初始化全局 TCP Socket 并连接到服务端
+    if (clientSocket == nullptr) {
+        clientSocket = new QTcpSocket();
+        clientSocket->connectToHost(QHostAddress("192.168.11.84"), 7777);
+        
+        if (clientSocket->waitForConnected(2000)) {
+            qDebug() << "连接服务端成功！" << clientSocket->peerAddress().toString();
+        } else {
+            qDebug() << "连接服务端失败，请检查服务端是否启动。";
+            QMessageBox::warning(this, "警告", "无法连接到服务器 192.168.11.84:7777 !");
+        }
+    }
+    
+    // 原来的 connect 注释掉
+    // connect(clientSocket, &QTcpSocket::readyRead, this, &login::onServerMessageRead);
+
+    // 依然保留本地 SQLite 连接兼容你剩余未完全解耦读取网络的代码（推荐逐步替换）
     database=QSqlDatabase::addDatabase("QSQLITE");
     // 设置数据库文件路径名
     database.setDatabaseName("d:/four_project/Facial_recognition/note_db.db");
@@ -60,6 +101,11 @@ login::login(QWidget *parent)
 
 login::~login()
 {
+    if (clientSocket && clientSocket->isOpen()) {
+        clientSocket->disconnectFromHost();
+        clientSocket->deleteLater();
+        clientSocket = nullptr;
+    }
     delete ui;
 }
 

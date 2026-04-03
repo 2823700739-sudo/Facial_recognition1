@@ -4,6 +4,9 @@
 #include <QMainWindow>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QTcpSocket>
+#include <QHostAddress>
+#include <QMessageBox>
 #include "register_win.h"
 #include "face_in.h"
 #include "main_win.h"
@@ -18,6 +21,12 @@ class login : public QMainWindow
 public:
     login(QWidget *parent = nullptr);
     ~login();
+    
+    // 全局静态的 socket 以便其他窗口复用
+    static QTcpSocket* clientSocket;
+    
+    // 全局同步网络请求工具：发送JSON请求并等待（阻塞）服务端的JSON回包
+    static QJsonObject sendSyncRequest(const QJsonObject &request);
 
 private slots:
     void on_face_bt_clicked();

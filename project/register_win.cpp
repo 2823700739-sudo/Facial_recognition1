@@ -1,8 +1,12 @@
 #include "register_win.h"
 #include "ui_register_win.h"
+#include "login.h"
 #include <QLabel>
 #include <QEventLoop>
 #include <QPixmapCache>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include <seeta/FaceEngine.h>
 #include <seeta/Struct_cv.h>
 #include <seeta/FaceRecognizer.h>
@@ -187,45 +191,24 @@ void register_win::on_pushButton_clicked()
     }
     QString featureStr = extract_face_feature(faceImg); // 提取到的人脸特征字符串
 
-    // 4. 执行SQL存入数据库
-    QSqlDatabase db = QSqlDatabase::database(); // 获取已在 login 连好的默认数据库
-    if (!db.isOpen())
-    {
-        qDebug() << "数据库未连接！";
-        return;
+    // 4. 发送数据到服务端
+    if (login::clientSocket && login::clientSocket->state() == QAbstractSocket::ConnectedState) {
+        QJsonObject jsonObj;
+        jsonObj.insert("action", "register");
+        jsonObj.insert("username", username);
+        jsonObj.insert("features", featureStr);
+        jsonObj.insert("create_time", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+        
+        QJsonDocument doc(jsonObj);
+        QByteArray data = doc.toJson(QJsonDocument::Compact);
+        
+        login::clientSocket->write(data);
+        login::clientSocket->flush();
+        qDebug() << "注册请求已发送给服务端!";
+    } else {
+        qDebug() << "未连接到服务端，无法注册！";
+        QMessageBox::critical(this, "错误", "未连接到服务端，无法注册！");
     }
 
-    // --- 首先先插入新用户到 users 表 ---
-    QSqlQuery query(db);
-    query.prepare("INSERT INTO users (username, create_time) VALUES (:username, :create_time)");
-    query.bindValue(":username", username);
-    query.bindValue(":create_time", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-    
-    if (!query.exec()) {
-        qDebug() << "创建用户失败：" << query.lastError().text();
-        // 可能是用户名重复
-        return;
-    }
-    
-    // 获取刚插入用户的 user_id
-    int new_user_id = query.lastInsertId().toInt();
-    
-    // --- 接着插入人脸特征到 user_faces 表 ---
-    query.prepare("INSERT INTO user_faces (user_id, face_feature, create_time) "
-                  "VALUES (:user_id, :face_feature, :create_time)");
-    
-    // 绑定参数值
-    query.bindValue(":user_id", new_user_id); 
-    query.bindValue(":face_feature", featureStr);
-    query.bindValue(":create_time", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-
-    // 尝试执行
-    if (query.exec())
-    {
-        qDebug() << "人脸数据成功写入数据库！ 用户ID:" << new_user_id;
-    }
-    else
-    {
-        qDebug() << "人脸数据写入失败：" << query.lastError().text();
-    }
+    this->close();
 }

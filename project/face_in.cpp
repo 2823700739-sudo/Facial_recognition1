@@ -1,11 +1,15 @@
 ﻿#include "face_in.h"
 #include "ui_face_in.h"
+#include "login.h"  // 加入 login 以便调用网络 sync 方法
 #include <seeta/FaceEngine.h>
 #include <seeta/Struct_cv.h>
 #include <seeta/FaceRecognizer.h>
 #include <QDebug>
 #include <QMessageBox>
 #include <QSqlError>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 static seeta::FaceEngine* engin = nullptr;
 
@@ -19,8 +23,10 @@ void init_seetaface() {
     }
 }
 
-face_in::face_in(QWidget *parent) : QWidget(parent),
-                                    ui(new Ui::face_in)
+face_in::face_in(QWidget *parent, bool unlock_mode, int target_user_id) : QWidget(parent),
+                                    ui(new Ui::face_in),
+                                    is_unlock_mode(unlock_mode),
+                                    m_target_user_id(target_user_id)
 {
     ui->setupUi(this);
 
@@ -49,7 +55,7 @@ face_in::face_in(QWidget *parent) : QWidget(parent),
     }
 
     timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &face_in::processFrame);
+    connect(timer, &QTimer::timeout, this, &face_in::processFrame);//通过定时器来实时读取人脸数据
     // 每35ms抓取一帧(~28fps)
     timer->start(35);
 }
@@ -63,33 +69,43 @@ face_in::~face_in()
 
 void face_in::loadUserFeatures()
 {
-    if (!database.isOpen()) return;
+    // 向服务器请求所有用户面部特征数据
+    QJsonObject req;
+    req.insert("action", "load_features");
+    
+    QJsonObject res = login::sendSyncRequest(req);
+    if(res.value("status").toString() != "success") {
+        qDebug() << "获取人脸数据失败: " << res.value("msg").toString();
+        return;
+    }
+    
+    QJsonArray usersArray = res.value("users").toArray();
+    
+    // 初始化 SeetaFace 的提取器以获取预期的特征长度
+    init_seetaface();
+    seeta::FaceRecognizer* fr = engin->FDB.ExtractionCore(0);
+    int expected_size = fr->GetExtractFeatureSize();
 
-    QSqlQuery query(database);
-    query.exec("SELECT u.user_id, u.username, f.face_feature FROM user_faces f JOIN users u ON u.user_id = f.user_id");
-
-    while (query.next()) {
-        int uid = query.value(0).toInt();
-        QString uname = query.value(1).toString();
-        QString featureStr = query.value(2).toString();
+    for (int i = 0; i < usersArray.size(); ++i) {
+        QJsonObject userObj = usersArray[i].toObject();
+        int uid = userObj.value("user_id").toInt();
+        QString uname = userObj.value("username").toString();
+        QString featureStr = userObj.value("face_feature").toString();
 
         QStringList list = featureStr.split(",", QString::SkipEmptyParts);
-        
-        seeta::FaceRecognizer* fr = engin->FDB.ExtractionCore(0);
-        int expected_size = fr->GetExtractFeatureSize();
 
         if (list.size() == expected_size) {
             UserFeature uf;
             uf.user_id = uid;
             uf.username = uname;
             uf.features.resize(expected_size);
-            for (int i = 0; i < expected_size; ++i) {
-                uf.features[i] = list.at(i).toFloat();
+            for (int j = 0; j < expected_size; ++j) {
+                uf.features[j] = list.at(j).toFloat();
             }
             registered_users.push_back(uf);
         }
     }
-    qDebug() << "已成功加载注册用户人脸数量：" << registered_users.size();
+    qDebug() << "已成功从云端加载注册用户人脸数量：" << registered_users.size();
 }
 
 void face_in::processFrame()
@@ -136,26 +152,32 @@ void face_in::processFrame()
                     }
                 }
 
-                if (max_sim > 0.6) {
-                    matchFound = true;
-                    qDebug() << "识别成功! 用户ID:" << best_user_id << "用户名:" << best_username << " 相似度:" << max_sim;
+                if (max_sim > 0.75) {
+                    if (is_unlock_mode && best_user_id != m_target_user_id) {
+                        qDebug() << "识别到人脸，但不是当前登录用户（禁止解锁）";
+                    } else {
+                        matchFound = true;
+                        qDebug() << "识别成功! 用户ID:" << best_user_id << "用户名:" << best_username << " 相似度:" << max_sim;
 
-                    // 停止定时器与摄像头，防重复触发
-                    timer->stop();
-                    cap.release();
-                    
-                    Main_win=new main_win(nullptr, best_user_id, best_username);
-                    Main_win->setAttribute(Qt::WA_DeleteOnClose); //关闭窗口时，删除窗口
-                    Main_win->setWindowModality(Qt::ApplicationModal); //窗口为模态窗口，只能在窗口关闭后才能操作
-                    Main_win->show();
-                    
-                    // 发送信号给主窗口(login)让它关闭
-                    emit loginSuccessful();
+                        // 停止定时器与摄像头，防重复触发
+                        timer->stop();
+                        cap.release();
+                        
+                        if (!is_unlock_mode) {
+                            Main_win=new main_win(nullptr, best_user_id, best_username);
+                            Main_win->setAttribute(Qt::WA_DeleteOnClose); //关闭窗口时，删除窗口
+                            Main_win->setWindowModality(Qt::ApplicationModal); //窗口为模态窗口，只能在窗口关闭后才能操作
+                            Main_win->show();
+                        }
+                        
+                        // 发送信号给主窗口(login)让它关闭
+                        emit loginSuccessful();
 
-                    //关闭自己(face_in)
-                    this->close();
-                
-                    return; 
+                        //关闭自己(face_in)
+                        this->close();
+                    
+                        return; 
+                    }
                 }
             }
         }
