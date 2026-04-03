@@ -89,6 +89,7 @@ void admin_win::initDatabase()
                ")");
 }
 
+// 更新当前连接客户端列表显示
 void admin_win::updateClientTable()
 {
     ui->clientTable->setRowCount(0);
@@ -105,6 +106,7 @@ void admin_win::updateClientTable()
     }
 }
 
+// 处理客户端请求
 void admin_win::onNewConnection()
 {
     while (tcpServer->hasPendingConnections()) {
@@ -178,11 +180,12 @@ void admin_win::processClientRequest(QTcpSocket* socket, const QByteArray& data)
         if (query.exec()) {
             int user_id = query.lastInsertId().toInt();
             
-            // 插入 user_faces 表
+            // 插入user_faces 表
             QSqlQuery faceQuery(db);
-            faceQuery.prepare("INSERT INTO user_faces (user_id, face_feature) VALUES (:user_id, :features)");
+            faceQuery.prepare("INSERT INTO user_faces (user_id, face_feature, create_time) VALUES (:user_id, :features, :create_time)");
             faceQuery.bindValue(":user_id", user_id);
             faceQuery.bindValue(":features", features);
+            faceQuery.bindValue(":create_time", create_time);
             
             if (faceQuery.exec()) {
                 response.insert("status", "success");
@@ -208,7 +211,7 @@ void admin_win::processClientRequest(QTcpSocket* socket, const QByteArray& data)
             userObj.insert("user_id", query.value(0).toInt());
             userObj.insert("username", query.value(1).toString());
             userObj.insert("face_feature", query.value(2).toString());
-            usersArray.append(userObj);
+            usersArray.append(userObj);//
         }
         response.insert("status", "success");
         response.insert("users", usersArray);

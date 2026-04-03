@@ -9,27 +9,27 @@
 // 静态成员初始化
 QTcpSocket* login::clientSocket = nullptr;
 
+// 全局同步网络请求工具：发送JSON请求并等待（阻塞）服务端的JSON回包
 QJsonObject login::sendSyncRequest(const QJsonObject &request)
 {
     if (!clientSocket || clientSocket->state() != QAbstractSocket::ConnectedState) {
         return QJsonObject();
     }
     
-    QByteArray sendData = QJsonDocument(request).toJson(QJsonDocument::Compact);
-    clientSocket->write(sendData);
-    clientSocket->flush();
+    QByteArray sendData = QJsonDocument(request).toJson(QJsonDocument::Compact);// 转成紧凑的 JSON 格式
+    clientSocket->write(sendData);// 发送数据
+    clientSocket->flush();// 确保数据发送出去
 
     // 简单粗暴的同步等待包回发机制
     if (clientSocket->waitForReadyRead(3000)) {
-        QByteArray recvData = clientSocket->readAll();
-        return QJsonDocument::fromJson(recvData).object();
+        QByteArray recvData = clientSocket->readAll();// 读取服务端回包
+        return QJsonDocument::fromJson(recvData).object();// 转回 JSON 对象
     }
     
     return QJsonObject();
 }
-
-login::login(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::login)
+// 刷新并加载用户的所有便签
+login::login(QWidget *parent): QMainWindow(parent), ui(new Ui::login)
 {
     ui->setupUi(this);
 
@@ -45,60 +45,9 @@ login::login(QWidget *parent)
             QMessageBox::warning(this, "警告", "无法连接到服务器 192.168.11.84:7777 !");
         }
     }
-    
-    // 原来的 connect 注释掉
-    // connect(clientSocket, &QTcpSocket::readyRead, this, &login::onServerMessageRead);
-
-    // 依然保留本地 SQLite 连接兼容你剩余未完全解耦读取网络的代码（推荐逐步替换）
-    database=QSqlDatabase::addDatabase("QSQLITE");
-    // 设置数据库文件路径名
-    database.setDatabaseName("d:/four_project/Facial_recognition/note_db.db");
-    // 打开数据库
-    bool ret = database.open();
-    if (ret)
-    {
-        qDebug() << "数据库打开成功";
-    }
-    else
-    {
-        qDebug() << "数据库打开失败";
-    }
-    // 创建数据表
-    QSqlQuery query(database);
-
-    // 创 users 表 - 单一人脸识别无密码
-    ret = query.exec("create table if not exists users (user_id INTEGER primary key autoincrement, username TEXT UNIQUE NOT NULL, create_time TEXT NOT NULL, last_login TEXT, status INTEGER DEFAULT 0);");
-    if (ret) qDebug() << "users 表创建成功";
-    else qDebug() << "users 表创建失败" << query.lastError().text();
-
-    // 创 user_faces 表
-    ret = query.exec("create table if not exists user_faces (face_id INTEGER primary key autoincrement,user_id INTEGER not null,face_feature text not null,create_time text not null);");
-    if (ret)
-    {
-        qDebug() << "用户人脸数据表创建成功";
-    }
-    else
-    {
-        qDebug() << "用户人脸数据表创建失败";
-    }
-    
-    // 创 notes 表
-    ret = query.exec("create table if not exists notes (note_id integer primary key autoincrement,user_id INTEGER NOT NULL,title TEXT,content TEXT,image_data TEXT,create_time TEXT NOT NULL,update_time TEXT NOT NULL);");
-    if (ret)
-    {
-        qDebug() << "notes 表创建成功";
-    }
-    else
-    {
-        qDebug() << "notes 表创建失败";
-    }
-
-    // 创 sessions 表
-    ret = query.exec("create table if not exists sessions (session_id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, session_token TEXT UNIQUE NOT NULL, login_time TEXT NOT NULL, expire_time TEXT NOT NULL, client_ip TEXT);");
-    if (ret) qDebug() << "sessions 表创建成功";
-    else qDebug() << "sessions 表创建失败" << query.lastError().text();
 }
 
+//
 login::~login()
 {
     if (clientSocket && clientSocket->isOpen()) {
@@ -129,3 +78,4 @@ void login::on_register_bt_clicked()
     res->setWindowModality(Qt::ApplicationModal); //注册窗口为模态窗口，只能在注册窗口关闭后才能操作
     res->show();
 }
+

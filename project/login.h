@@ -35,7 +35,6 @@ private slots:
 
 private:
     Ui::login *ui;
-    QSqlDatabase database;
     register_win *res;//注册界面
     face_in *face_win;//人脸识别界面
     main_win *Main_win;//主菜单界面

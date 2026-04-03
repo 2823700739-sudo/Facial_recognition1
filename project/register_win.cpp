@@ -10,7 +10,7 @@
 #include <seeta/FaceEngine.h>
 #include <seeta/Struct_cv.h>
 #include <seeta/FaceRecognizer.h>
-
+#include<QFile>
 static seeta::FaceEngine* engin_reg = nullptr;
 
 void init_seetaface_reg() {
@@ -96,6 +96,8 @@ register_win::register_win(QWidget *parent) : QWidget(parent),
 
 register_win::~register_win()
 {
+    // 如果存在抓拍的缓存图片，每次关闭注册窗口都清除它
+    QFile::remove("D:/four_project/Facial_recognition/take_picture/register/1.jpg");
     delete ui;
 }
 
@@ -173,12 +175,17 @@ void register_win::on_pushButton_clicked()
 {
     // 1. 获取当前抓拍好的照片路径
     QString imgPath = "D:/four_project/Facial_recognition/take_picture/register/1.jpg";
+    QFile file(imgPath);
+    if (!file.exists()) {
+        QMessageBox::warning(this, "警告", "请优先开启摄像头并抓拍一张人脸照片！");
+        return;
+    }
 
     // 2. 获取用户名
     QString username = ui->lineEdit->text().trimmed();
     if (username.isEmpty()) {
         qDebug() << "注册失败：用户名不能为空！";
-        // 这里可以弹窗提示用户
+        QMessageBox::warning(this, "警告", "注册失败：用户名不能为空！");
         return;
     }
 
@@ -187,9 +194,14 @@ void register_win::on_pushButton_clicked()
     if (faceImg.empty())
     {
         qDebug() << "注册失败：画面中未检测到人脸！";
+        QMessageBox::warning(this, "警告", "注册失败：画面中未检测到清晰人脸！请确保正对摄像头重新抓拍！");
         return;
     }
     QString featureStr = extract_face_feature(faceImg); // 提取到的人脸特征字符串
+    if (featureStr.isEmpty() || featureStr.length() < 10) {
+        QMessageBox::warning(this, "警告", "人脸特征提取失败，请重试！");
+        return;
+    }
 
     // 4. 发送数据到服务端
     if (login::clientSocket && login::clientSocket->state() == QAbstractSocket::ConnectedState) {
