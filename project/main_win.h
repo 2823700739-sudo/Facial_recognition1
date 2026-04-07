@@ -29,6 +29,8 @@ private slots:
 
     void on_del_bt_clicked();
 
+    void on_dateTimeEdit_dateChanged(const QDate &date);
+
 private:
     Ui::main_win *ui;
     QSqlDatabase db;//创建数据库对象

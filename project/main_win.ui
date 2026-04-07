@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>786</width>
-    <height>434</height>
+    <width>834</width>
+    <height>493</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,18 +19,24 @@
   <widget class="QLineEdit" name="lineEdit">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>161</width>
+     <x>10</x>
+     <y>70</y>
+     <width>181</width>
      <height>40</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 224, 217);</string>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
   <widget class="QPushButton" name="add_bt">
    <property name="geometry">
     <rect>
-     <x>660</x>
-     <y>320</y>
+     <x>710</x>
+     <y>390</y>
      <width>90</width>
      <height>90</height>
     </rect>
@@ -64,18 +70,21 @@ image: url(:/new/prefix1/image/save.png);</string>
   <widget class="QTableWidget" name="tableWidget">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>70</y>
-     <width>161</width>
-     <height>298</height>
+     <x>10</x>
+     <y>117</y>
+     <width>181</width>
+     <height>321</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 238, 222);</string>
    </property>
   </widget>
   <widget class="QPushButton" name="lock_bt">
    <property name="geometry">
     <rect>
-     <x>660</x>
-     <y>90</y>
+     <x>710</x>
+     <y>70</y>
      <width>90</width>
      <height>90</height>
     </rect>
@@ -102,9 +111,9 @@ image: url(:/new/prefix1/image/save.png);</string>
   <widget class="QPushButton" name="find_bt">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>20</y>
-     <width>40</width>
+     <x>150</x>
+     <y>70</y>
+     <width>41</width>
      <height>40</height>
     </rect>
    </property>
@@ -119,7 +128,7 @@ image: url(:/new/prefix1/image/save.png);</string>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>610</x>
+     <x>660</x>
      <y>10</y>
      <width>171</width>
      <height>51</height>
@@ -159,6 +168,9 @@ image: url(:/new/prefix1/image/save.png);</string>
           <pointsize>12</pointsize>
          </font>
         </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(0, 170, 255);</string>
+        </property>
         <property name="text">
          <string>欢迎回来</string>
         </property>
@@ -192,6 +204,9 @@ image: url(:/new/prefix1/image/save.png);</string>
         <pointsize>12</pointsize>
        </font>
       </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 170, 0);</string>
+      </property>
       <property name="text">
        <string>user1的私密空间</string>
       </property>
@@ -205,10 +220,10 @@ image: url(:/new/prefix1/image/save.png);</string>
   <widget class="QTextEdit" name="textEdit">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>210</x>
      <y>70</y>
-     <width>431</width>
-     <height>341</height>
+     <width>481</width>
+     <height>411</height>
     </rect>
    </property>
    <property name="font">
@@ -217,6 +232,9 @@ image: url(:/new/prefix1/image/save.png);</string>
      <pointsize>12</pointsize>
     </font>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(216, 255, 244);</string>
+   </property>
    <property name="placeholderText">
     <string>请输入要保存的信息</string>
    </property>
@@ -224,8 +242,8 @@ image: url(:/new/prefix1/image/save.png);</string>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>30</y>
+     <x>300</x>
+     <y>20</y>
      <width>271</width>
      <height>31</height>
     </rect>
@@ -236,6 +254,9 @@ image: url(:/new/prefix1/image/save.png);</string>
      <pointsize>20</pointsize>
     </font>
    </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(85, 85, 255);</string>
+   </property>
    <property name="text">
     <string>请输入您要保存的信息</string>
    </property>
@@ -243,9 +264,9 @@ image: url(:/new/prefix1/image/save.png);</string>
   <widget class="QPushButton" name="del_bt">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>370</y>
-     <width>161</width>
+     <x>10</x>
+     <y>440</y>
+     <width>181</width>
      <height>41</height>
     </rect>
    </property>
@@ -257,6 +278,25 @@ image: url(:/new/prefix1/image/save.png);</string>
    </property>
    <property name="text">
     <string>删除便签</string>
+   </property>
+  </widget>
+  <widget class="QDateTimeEdit" name="dateTimeEdit">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>20</y>
+     <width>181</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="displayFormat">
+    <string>yyyy/M/d </string>
+   </property>
+   <property name="calendarPopup">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

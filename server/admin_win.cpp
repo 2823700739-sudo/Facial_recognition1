@@ -6,8 +6,7 @@
 #include <QHostAddress>
 
 admin_win::admin_win(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::admin_win)
+    : QMainWindow(parent), ui(new Ui::admin_win)
 {
     ui->setupUi(this);
     this->setWindowTitle("服务端监控管理系统");
@@ -22,9 +21,12 @@ admin_win::admin_win(QWidget *parent)
 
     // 初始化TCP服务器
     tcpServer = new QTcpServer(this);
-    if (!tcpServer->listen(QHostAddress("192.168.11.84"), 7777)) {
+    if (!tcpServer->listen(QHostAddress("192.168.11.84"), 7777))
+    {
         logMessage("错误：服务器启动失败：" + tcpServer->errorString());
-    } else {
+    }
+    else
+    {
         logMessage("服务器启动成功，正在监听端口 7777...");
     }
 
@@ -34,7 +36,8 @@ admin_win::admin_win(QWidget *parent)
 admin_win::~admin_win()
 {
     // 如果有未关闭的连接则将其闭合
-    foreach(QTcpSocket* socket, clientInfos.keys()) {
+    foreach (QTcpSocket *socket, clientInfos.keys())
+    {
         socket->disconnectFromHost();
     }
     tcpServer->close();
@@ -52,17 +55,18 @@ void admin_win::initDatabase()
     // 在这里配置数据库，目前存在于 "d:/four_project/Facial_recognition/note_db.db"
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("d:/four_project/Facial_recognition/note_db.db");
-    
-    if (!db.open()) {
+
+    if (!db.open())
+    {
         logMessage("错误：数据库连接失败 - " + db.lastError().text());
         return;
     }
-    
+
     logMessage("数据库连接成功！");
-    
+
     // 初始化表结构，防止初次运行没有表
     QSqlQuery query(db);
-    
+
     // 用户表
     query.exec("CREATE TABLE IF NOT EXISTS users ("
                "user_id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -94,10 +98,11 @@ void admin_win::updateClientTable()
 {
     ui->clientTable->setRowCount(0);
     int row = 0;
-    QMapIterator<QTcpSocket*, QString> i(clientInfos);
-    while (i.hasNext()) {
+    QMapIterator<QTcpSocket *, QString> i(clientInfos);
+    while (i.hasNext())
+    {
         i.next();
-        QTcpSocket* socket = i.key();
+        QTcpSocket *socket = i.key();
         ui->clientTable->insertRow(row);
         ui->clientTable->setItem(row, 0, new QTableWidgetItem(socket->peerAddress().toString()));
         ui->clientTable->setItem(row, 1, new QTableWidgetItem(QString::number(socket->peerPort())));
@@ -109,14 +114,17 @@ void admin_win::updateClientTable()
 // 处理客户端请求
 void admin_win::onNewConnection()
 {
-    while (tcpServer->hasPendingConnections()) {
+    while (tcpServer->hasPendingConnections())
+    {
         QTcpSocket *socket = tcpServer->nextPendingConnection();
-        if (socket) {
+        if (socket)
+        {
             QString ip = socket->peerAddress().toString();
             logMessage("新客户端已连接：" + ip + ":" + QString::number(socket->peerPort()));
             clientInfos.insert(socket, "已连接");
             updateClientTable();
-
+            
+            // 连接信号槽，处理客户端发来的数据和断开事件
             connect(socket, &QTcpSocket::readyRead, this, &admin_win::onReadyRead);
             connect(socket, &QTcpSocket::disconnected, this, &admin_win::onClientDisconnected);
         }
@@ -125,9 +133,10 @@ void admin_win::onNewConnection()
 
 void admin_win::onReadyRead()
 {
-    QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
-    if (!socket) return;
-    
+    QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
+    if (!socket)
+        return;
+
     // 可能一次收到多条消息，这里按简单方式处理，更严谨的通常有包头包尾解析
     QByteArray data = socket->readAll();
     processClientRequest(socket, data);
@@ -135,8 +144,9 @@ void admin_win::onReadyRead()
 
 void admin_win::onClientDisconnected()
 {
-    QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
-    if (!socket) return;
+    QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
+    if (!socket)
+        return;
 
     QString ip = socket->peerAddress().toString();
     logMessage("客户端断开连接：" + ip + ":" + QString::number(socket->peerPort()));
@@ -146,27 +156,29 @@ void admin_win::onClientDisconnected()
     socket->deleteLater();
 }
 
-void admin_win::processClientRequest(QTcpSocket* socket, const QByteArray& data)
+void admin_win::processClientRequest(QTcpSocket *socket, const QByteArray &data)
 {
     // 这里简单设计为一串 JSON 命令
     // {"action":"register", "username":"test", "features":"0.1,0.2..."}
     QJsonParseError error;
-    QJsonDocument doc = QJsonDocument::fromJson(data, &error);
-    if (error.error != QJsonParseError::NoError) {
+    QJsonDocument doc = QJsonDocument::fromJson(data, &error);// 解析 JSON 数据
+    if (error.error != QJsonParseError::NoError)
+    {
         logMessage("收到未知/非法格式的数据请求：" + QString(data));
         return;
     }
 
-    QJsonObject obj = doc.object();
+    QJsonObject obj = doc.object();// 获取 action 字段以区分请求类型
     QString action = obj.value("action").toString();
 
     // 根据 action 区分客户端来的注册/读取请求，然后回发处理结果
     logMessage("收到客户端请求动作: " + action);
-    
+
     QJsonObject response;
     response.insert("action_reply", action);
 
-    if (action == "register") {
+    if (action == "register")
+    {
         QString username = obj.value("username").toString();
         QString features = obj.value("features").toString();
         QString create_time = obj.value("create_time").toString();
@@ -176,54 +188,65 @@ void admin_win::processClientRequest(QTcpSocket* socket, const QByteArray& data)
         query.prepare("INSERT INTO users (username, create_time) VALUES (:username, :create_time)");
         query.bindValue(":username", username);
         query.bindValue(":create_time", create_time);
-        
-        if (query.exec()) {
+
+        if (query.exec())
+        {
             int user_id = query.lastInsertId().toInt();
-            
+
             // 插入user_faces 表
             QSqlQuery faceQuery(db);
             faceQuery.prepare("INSERT INTO user_faces (user_id, face_feature, create_time) VALUES (:user_id, :features, :create_time)");
             faceQuery.bindValue(":user_id", user_id);
             faceQuery.bindValue(":features", features);
             faceQuery.bindValue(":create_time", create_time);
-            
-            if (faceQuery.exec()) {
+
+            if (faceQuery.exec())
+            {
                 response.insert("status", "success");
                 response.insert("msg", "账户 " + username + " 注册成功！");
                 logMessage("账户 " + username + " 在服务端注册成功");
-            } else {
+            }
+            else
+            {
                 response.insert("status", "error");
                 response.insert("msg", "特征录入失败: " + faceQuery.lastError().text());
                 logMessage("特征录入失败: " + faceQuery.lastError().text());
             }
-        } else {
+        }
+        else
+        {
             response.insert("status", "error");
             response.insert("msg", "账户名可能已存在/创建失败: " + query.lastError().text());
             logMessage("创建用户失败: " + query.lastError().text());
         }
-    } 
-    else if (action == "load_features") {
+    }
+    else if (action == "load_features")
+    {
         QJsonArray usersArray;
         QSqlQuery query(db);
         query.exec("SELECT u.user_id, u.username, f.face_feature FROM user_faces f JOIN users u ON u.user_id = f.user_id");
-        while (query.next()) {
+        while (query.next())
+        {
             QJsonObject userObj;
             userObj.insert("user_id", query.value(0).toInt());
             userObj.insert("username", query.value(1).toString());
             userObj.insert("face_feature", query.value(2).toString());
-            usersArray.append(userObj);//
+            usersArray.append(userObj); //
         }
         response.insert("status", "success");
         response.insert("users", usersArray);
     }
-    else if (action == "load_notes") {
+    else if (action == "load_notes")
+    {
         int user_id = obj.value("user_id").toInt();
         QJsonArray notesArray;
         QSqlQuery query(db);
         query.prepare("SELECT note_id, title, update_time FROM notes WHERE user_id = :user_id ORDER BY update_time DESC");
         query.bindValue(":user_id", user_id);
-        if (query.exec()) {
-            while (query.next()) {
+        if (query.exec())
+        {
+            while (query.next())
+            {
                 QJsonObject noteObj;
                 noteObj.insert("note_id", query.value(0).toInt());
                 noteObj.insert("title", query.value(1).toString());
@@ -234,7 +257,8 @@ void admin_win::processClientRequest(QTcpSocket* socket, const QByteArray& data)
         response.insert("status", "success");
         response.insert("notes", notesArray);
     }
-    else if (action == "save_note") {
+    else if (action == "save_note")
+    {
         int is_new = obj.value("is_new").toInt();
         int user_id = obj.value("user_id").toInt();
         QString title = obj.value("title").toString();
@@ -242,14 +266,17 @@ void admin_win::processClientRequest(QTcpSocket* socket, const QByteArray& data)
         QString current_time = obj.value("time").toString();
 
         QSqlQuery query(db);
-        if (is_new == 1) {
+        if (is_new == 1)
+        {
             query.prepare("INSERT INTO notes (user_id, title, content, create_time, update_time) VALUES (:u, :t, :c, :ct, :ut)");
             query.bindValue(":u", user_id);
             query.bindValue(":t", title);
             query.bindValue(":c", content);
             query.bindValue(":ct", current_time);
             query.bindValue(":ut", current_time);
-        } else {
+        }
+        else
+        {
             int note_id = obj.value("note_id").toInt();
             query.prepare("UPDATE notes SET title = :t, content = :c, update_time = :ut WHERE note_id = :n AND user_id = :u");
             query.bindValue(":t", title);
@@ -259,41 +286,53 @@ void admin_win::processClientRequest(QTcpSocket* socket, const QByteArray& data)
             query.bindValue(":u", user_id);
         }
 
-        if (query.exec()) {
+        if (query.exec())
+        {
             response.insert("status", "success");
-        } else {
+        }
+        else
+        {
             response.insert("status", "error");
             response.insert("msg", query.lastError().text());
         }
     }
-    else if (action == "load_note_content") {
+    else if (action == "load_note_content")
+    {
         int note_id = obj.value("note_id").toInt();
         int user_id = obj.value("user_id").toInt();
         QSqlQuery query(db);
         query.prepare("SELECT content FROM notes WHERE note_id = :note_id AND user_id = :user_id");
         query.bindValue(":note_id", note_id);
         query.bindValue(":user_id", user_id);
-        if (query.exec() && query.next()) {
+        if (query.exec() && query.next())
+        {
             response.insert("status", "success");
             response.insert("content", query.value(0).toString());
-        } else {
+        }
+        else
+        {
             response.insert("status", "error");
         }
     }
-    else if (action == "delete_note") {
+    else if (action == "delete_note")
+    {
         int note_id = obj.value("note_id").toInt();
         int user_id = obj.value("user_id").toInt();
         QSqlQuery query(db);
         query.prepare("DELETE FROM notes WHERE note_id = :note_id AND user_id = :user_id");
         query.bindValue(":note_id", note_id);
         query.bindValue(":user_id", user_id);
-        if (query.exec()) {
+        if (query.exec())
+        {
             response.insert("status", "success");
-        } else {
+        }
+        else
+        {
             response.insert("status", "error");
         }
     }
-    else if (action == "search_notes") {
+    else if (action == "search_notes")
+    {
         int user_id = obj.value("user_id").toInt();
         QString keyword = obj.value("keyword").toString();
         QJsonArray notesArray;
@@ -301,8 +340,10 @@ void admin_win::processClientRequest(QTcpSocket* socket, const QByteArray& data)
         query.prepare("SELECT note_id, title, update_time FROM notes WHERE user_id = :user_id AND (title LIKE :keyword OR content LIKE :keyword) ORDER BY update_time DESC");
         query.bindValue(":user_id", user_id);
         query.bindValue(":keyword", "%" + keyword + "%");
-        if (query.exec()) {
-            while (query.next()) {
+        if (query.exec())
+        {
+            while (query.next())
+            {
                 QJsonObject noteObj;
                 noteObj.insert("note_id", query.value(0).toInt());
                 noteObj.insert("title", query.value(1).toString());
@@ -313,7 +354,32 @@ void admin_win::processClientRequest(QTcpSocket* socket, const QByteArray& data)
         response.insert("status", "success");
         response.insert("notes", notesArray);
     }
-    else {
+    else if (action == "load_notes_by_date")
+    {
+        int user_id = obj.value("user_id").toInt();
+        QString target_date = obj.value("date").toString(); // 拿到日期
+        QSqlQuery query(db);
+        query.prepare("SELECT note_id, title, update_time FROM notes WHERE user_id = :uid AND update_time LIKE :dateMatch ORDER BY update_time DESC");
+        query.bindValue(":uid", user_id);
+        query.bindValue(":dateMatch", target_date + "%"); // 变成 "2026-04-07%"
+
+        QJsonArray notesArray;
+        if (query.exec())
+        {
+            while (query.next())
+            {
+                QJsonObject noteObj;
+                noteObj.insert("note_id", query.value(0).toInt());
+                noteObj.insert("title", query.value(1).toString());
+                noteObj.insert("update_time", query.value(2).toString());
+                notesArray.append(noteObj);
+            }
+        }
+        response.insert("notes", notesArray);
+        response.insert("status", "success");
+    }
+    else
+    {
         response.insert("status", "error");
         response.insert("msg", "未知的请求行为");
     }

@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QDateTimeEdit>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
@@ -42,19 +43,21 @@ public:
     QTextEdit *textEdit;
     QLabel *label_2;
     QPushButton *del_bt;
+    QDateTimeEdit *dateTimeEdit;
 
     void setupUi(QWidget *main_win)
     {
         if (main_win->objectName().isEmpty())
             main_win->setObjectName(QString::fromUtf8("main_win"));
-        main_win->resize(786, 434);
+        main_win->resize(834, 493);
         main_win->setStyleSheet(QString::fromUtf8(""));
         lineEdit = new QLineEdit(main_win);
         lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
-        lineEdit->setGeometry(QRect(20, 20, 161, 40));
+        lineEdit->setGeometry(QRect(10, 70, 181, 40));
+        lineEdit->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 224, 217);"));
         add_bt = new QPushButton(main_win);
         add_bt->setObjectName(QString::fromUtf8("add_bt"));
-        add_bt->setGeometry(QRect(660, 320, 90, 90));
+        add_bt->setGeometry(QRect(710, 390, 90, 90));
         add_bt->setMinimumSize(QSize(90, 90));
         QFont font;
         font.setFamily(QString::fromUtf8("Arial"));
@@ -65,21 +68,22 @@ public:
         add_bt->setIconSize(QSize(90, 90));
         tableWidget = new QTableWidget(main_win);
         tableWidget->setObjectName(QString::fromUtf8("tableWidget"));
-        tableWidget->setGeometry(QRect(20, 70, 161, 298));
+        tableWidget->setGeometry(QRect(10, 117, 181, 321));
+        tableWidget->setStyleSheet(QString::fromUtf8("background-color: rgb(255, 238, 222);"));
         lock_bt = new QPushButton(main_win);
         lock_bt->setObjectName(QString::fromUtf8("lock_bt"));
-        lock_bt->setGeometry(QRect(660, 90, 90, 90));
+        lock_bt->setGeometry(QRect(710, 70, 90, 90));
         lock_bt->setMinimumSize(QSize(90, 90));
         lock_bt->setStyleSheet(QString::fromUtf8("image: url(:/new/prefix1/image/lock.png);"));
         lock_bt->setIconSize(QSize(90, 90));
         find_bt = new QPushButton(main_win);
         find_bt->setObjectName(QString::fromUtf8("find_bt"));
-        find_bt->setGeometry(QRect(140, 20, 40, 40));
+        find_bt->setGeometry(QRect(150, 70, 41, 40));
         find_bt->setStyleSheet(QString::fromUtf8("image: url(:/new/prefix1/image/serach.png);\n"
 ""));
         layoutWidget = new QWidget(main_win);
         layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(610, 10, 171, 51));
+        layoutWidget->setGeometry(QRect(660, 10, 171, 51));
         QFont font1;
         font1.setFamily(QString::fromUtf8("\351\273\221\344\275\223"));
         layoutWidget->setFont(font1);
@@ -98,6 +102,7 @@ public:
         font2.setFamily(QString::fromUtf8("\351\273\221\344\275\223"));
         font2.setPointSize(12);
         label->setFont(font2);
+        label->setStyleSheet(QString::fromUtf8("color: rgb(0, 170, 255);"));
 
         horizontalLayout->addWidget(label);
 
@@ -111,31 +116,39 @@ public:
         welcome_lb = new QLabel(layoutWidget);
         welcome_lb->setObjectName(QString::fromUtf8("welcome_lb"));
         welcome_lb->setFont(font2);
+        welcome_lb->setStyleSheet(QString::fromUtf8("color: rgb(255, 170, 0);"));
         welcome_lb->setAlignment(Qt::AlignCenter);
 
         verticalLayout->addWidget(welcome_lb);
 
         textEdit = new QTextEdit(main_win);
         textEdit->setObjectName(QString::fromUtf8("textEdit"));
-        textEdit->setGeometry(QRect(190, 70, 431, 341));
+        textEdit->setGeometry(QRect(210, 70, 481, 411));
         QFont font3;
         font3.setFamily(QString::fromUtf8("Arial"));
         font3.setPointSize(12);
         textEdit->setFont(font3);
+        textEdit->setStyleSheet(QString::fromUtf8("background-color: rgb(216, 255, 244);"));
         label_2 = new QLabel(main_win);
         label_2->setObjectName(QString::fromUtf8("label_2"));
-        label_2->setGeometry(QRect(270, 30, 271, 31));
+        label_2->setGeometry(QRect(300, 20, 271, 31));
         QFont font4;
         font4.setFamily(QString::fromUtf8("Arial"));
         font4.setPointSize(20);
         label_2->setFont(font4);
+        label_2->setStyleSheet(QString::fromUtf8("color: rgb(85, 85, 255);"));
         del_bt = new QPushButton(main_win);
         del_bt->setObjectName(QString::fromUtf8("del_bt"));
-        del_bt->setGeometry(QRect(20, 370, 161, 41));
+        del_bt->setGeometry(QRect(10, 440, 181, 41));
         QFont font5;
         font5.setFamily(QString::fromUtf8("\345\255\227\351\255\202132\345\217\267-\346\261\237\350\210\237\350\241\214\345\256\242"));
         font5.setPointSize(18);
         del_bt->setFont(font5);
+        dateTimeEdit = new QDateTimeEdit(main_win);
+        dateTimeEdit->setObjectName(QString::fromUtf8("dateTimeEdit"));
+        dateTimeEdit->setGeometry(QRect(10, 20, 181, 41));
+        dateTimeEdit->setStyleSheet(QString::fromUtf8(""));
+        dateTimeEdit->setCalendarPopup(true);
 
         retranslateUi(main_win);
 
@@ -145,6 +158,7 @@ public:
     void retranslateUi(QWidget *main_win)
     {
         main_win->setWindowTitle(QCoreApplication::translate("main_win", "Form", nullptr));
+        lineEdit->setText(QString());
         add_bt->setText(QString());
         lock_bt->setText(QString());
         find_bt->setText(QString());
@@ -153,6 +167,7 @@ public:
         textEdit->setPlaceholderText(QCoreApplication::translate("main_win", "\350\257\267\350\276\223\345\205\245\350\246\201\344\277\235\345\255\230\347\232\204\344\277\241\346\201\257", nullptr));
         label_2->setText(QCoreApplication::translate("main_win", "\350\257\267\350\276\223\345\205\245\346\202\250\350\246\201\344\277\235\345\255\230\347\232\204\344\277\241\346\201\257", nullptr));
         del_bt->setText(QCoreApplication::translate("main_win", "\345\210\240\351\231\244\344\276\277\347\255\276", nullptr));
+        dateTimeEdit->setDisplayFormat(QCoreApplication::translate("main_win", "yyyy/M/d ", nullptr));
     } // retranslateUi
 
 };

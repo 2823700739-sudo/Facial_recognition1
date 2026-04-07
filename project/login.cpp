@@ -20,7 +20,7 @@ QJsonObject login::sendSyncRequest(const QJsonObject &request)
     clientSocket->write(sendData);// 发送数据
     clientSocket->flush();// 确保数据发送出去
 
-    // 简单粗暴的同步等待包回发机制
+    // 同步等待服务端回包，设置超时时间为 3 秒
     if (clientSocket->waitForReadyRead(3000)) {
         QByteArray recvData = clientSocket->readAll();// 读取服务端回包
         return QJsonDocument::fromJson(recvData).object();// 转回 JSON 对象
@@ -32,7 +32,7 @@ QJsonObject login::sendSyncRequest(const QJsonObject &request)
 login::login(QWidget *parent): QMainWindow(parent), ui(new Ui::login)
 {
     ui->setupUi(this);
-
+    this->setWindowTitle("登入界面");
     // 初始化全局 TCP Socket 并连接到服务端
     if (clientSocket == nullptr) {
         clientSocket = new QTcpSocket();

@@ -15,6 +15,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
 #include "main_win.h"
+using namespace std;
 namespace Ui {
 class face_in;
 }
@@ -46,9 +47,9 @@ private:
     struct UserFeature {
         int user_id;// 用户 ID
         QString username;// 方便调试显示用户名
-        std::vector<float> features;// 存储人脸特征的向量（长度由 SeetaFace 的 FR 模块决定）
+        vector<float> features;// 存储人脸特征的向量（长度由 SeetaFace 的 FR 模块决定）
     };
-    std::vector<UserFeature> registered_users;
+    vector<UserFeature> registered_users;
 
     void loadUserFeatures();
     cv::Mat QImageToMat(const QImage& image);

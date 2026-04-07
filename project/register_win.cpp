@@ -83,6 +83,7 @@ register_win::register_win(QWidget *parent) : QWidget(parent),
                                               ui(new Ui::register_win)
 {
     ui->setupUi(this);
+    this->setWindowTitle("注册界面");
     // 获取系统中所有可以使用的摄像头信息
     QList<QCameraInfo> camlist = QCameraInfo::availableCameras();
     // 遍历容器
@@ -208,14 +209,14 @@ void register_win::on_pushButton_clicked()
         QJsonObject jsonObj;
         jsonObj.insert("action", "register");
         jsonObj.insert("username", username);
-        jsonObj.insert("features", featureStr);
+        jsonObj.insert("features", featureStr);//把人脸特征字符串发送给服务端
         jsonObj.insert("create_time", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
         
         QJsonDocument doc(jsonObj);
         QByteArray data = doc.toJson(QJsonDocument::Compact);
         
-        login::clientSocket->write(data);
-        login::clientSocket->flush();
+        login::clientSocket->write(data);// 发送数据
+        login::clientSocket->flush();//刷新缓冲区确保数据发送出去
         qDebug() << "注册请求已发送给服务端!";
     } else {
         qDebug() << "未连接到服务端，无法注册！";

@@ -29,7 +29,7 @@ face_in::face_in(QWidget *parent, bool unlock_mode, int target_user_id) : QWidge
                                     m_target_user_id(target_user_id)
 {
     ui->setupUi(this);
-
+    this->setWindowTitle("人脸识别界面");
     // Initializing SeetaFace globally
     init_seetaface();
 
@@ -113,7 +113,7 @@ void face_in::processFrame()
     if (!cap.isOpened()) return;
 
     cv::Mat frame;
-    cap >> frame;
+    cap >> frame;// 从摄像头读取一帧图像
     if (frame.empty()) return;
 
     // 图像镜像翻转 (通常摄像头读取自带镜像)
@@ -161,10 +161,11 @@ void face_in::processFrame()
 
                         // 停止定时器与摄像头，防重复触发
                         timer->stop();
-                        cap.release();
+                        cap.release();// 释放摄像头资源
                         
+                        // 如果这是解锁模式，且识别成功的用户就是当前登录用户，则直接关闭蒙版；如果这是普通登录模式，则打开主界面
                         if (!is_unlock_mode) {
-                            Main_win=new main_win(nullptr, best_user_id, best_username);
+                            Main_win=new main_win(nullptr, best_user_id, best_username);//识别成功后打开主界面，并传入用户 ID 和用户名以便显示欢迎语和后续网络请求使用
                             Main_win->setAttribute(Qt::WA_DeleteOnClose); //关闭窗口时，删除窗口
                             Main_win->setWindowModality(Qt::ApplicationModal); //窗口为模态窗口，只能在窗口关闭后才能操作
                             Main_win->show();

@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_main_win_t {
-    QByteArrayData data[9];
-    char stringdata0[128];
+    QByteArrayData data[11];
+    char stringdata0[161];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -40,13 +40,16 @@ QT_MOC_LITERAL(4, 47, 18), // "on_find_bt_clicked"
 QT_MOC_LITERAL(5, 66, 32), // "on_tableWidget_cellDoubleClicked"
 QT_MOC_LITERAL(6, 99, 3), // "row"
 QT_MOC_LITERAL(7, 103, 6), // "column"
-QT_MOC_LITERAL(8, 110, 17) // "on_del_bt_clicked"
+QT_MOC_LITERAL(8, 110, 17), // "on_del_bt_clicked"
+QT_MOC_LITERAL(9, 128, 27), // "on_dateTimeEdit_dateChanged"
+QT_MOC_LITERAL(10, 156, 4) // "date"
 
     },
     "main_win\0on_add_bt_clicked\0\0"
     "on_lock_bt_clicked\0on_find_bt_clicked\0"
     "on_tableWidget_cellDoubleClicked\0row\0"
-    "column\0on_del_bt_clicked"
+    "column\0on_del_bt_clicked\0"
+    "on_dateTimeEdit_dateChanged\0date"
 };
 #undef QT_MOC_LITERAL
 
@@ -56,7 +59,7 @@ static const uint qt_meta_data_main_win[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       5,   14, // methods
+       6,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -64,11 +67,12 @@ static const uint qt_meta_data_main_win[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   39,    2, 0x08 /* Private */,
-       3,    0,   40,    2, 0x08 /* Private */,
-       4,    0,   41,    2, 0x08 /* Private */,
-       5,    2,   42,    2, 0x08 /* Private */,
-       8,    0,   47,    2, 0x08 /* Private */,
+       1,    0,   44,    2, 0x08 /* Private */,
+       3,    0,   45,    2, 0x08 /* Private */,
+       4,    0,   46,    2, 0x08 /* Private */,
+       5,    2,   47,    2, 0x08 /* Private */,
+       8,    0,   52,    2, 0x08 /* Private */,
+       9,    1,   53,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -76,6 +80,7 @@ static const uint qt_meta_data_main_win[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int, QMetaType::Int,    6,    7,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::QDate,   10,
 
        0        // eod
 };
@@ -91,6 +96,7 @@ void main_win::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         case 2: _t->on_find_bt_clicked(); break;
         case 3: _t->on_tableWidget_cellDoubleClicked((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         case 4: _t->on_del_bt_clicked(); break;
+        case 5: _t->on_dateTimeEdit_dateChanged((*reinterpret_cast< const QDate(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -125,13 +131,13 @@ int main_win::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 6)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 6;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 6)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 5;
+        _id -= 6;
     }
     return _id;
 }
