@@ -5,7 +5,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-
 // 静态成员初始化
 QTcpSocket* login::clientSocket = nullptr;
 
@@ -36,6 +35,7 @@ login::login(QWidget *parent): QMainWindow(parent), ui(new Ui::login)
     // 初始化全局 TCP Socket 并连接到服务端
     if (clientSocket == nullptr) {
         clientSocket = new QTcpSocket();
+        //clientSocket->bind(QHostAddress("192.168.11.84"),10000);
         clientSocket->connectToHost(QHostAddress("192.168.11.84"), 7777);
         
         if (clientSocket->waitForConnected(2000)) {
@@ -45,6 +45,8 @@ login::login(QWidget *parent): QMainWindow(parent), ui(new Ui::login)
             QMessageBox::warning(this, "警告", "无法连接到服务器 192.168.11.84:7777 !");
         }
     }
+
+
 }
 
 //

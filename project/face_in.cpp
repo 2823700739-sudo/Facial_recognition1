@@ -60,6 +60,7 @@ face_in::face_in(QWidget *parent, bool unlock_mode, int target_user_id) : QWidge
     timer->start(35);
 }
 
+// 析构函数中确保摄像头资源被释放，定时器被停止
 face_in::~face_in()
 {
     if (timer->isActive()) timer->stop();
@@ -113,7 +114,7 @@ void face_in::processFrame()
     if (!cap.isOpened()) return;
 
     cv::Mat frame;
-    cap >> frame;// 从摄像头读取一帧图像
+    cap.read(frame); // 从摄像头读取一帧图像
     if (frame.empty()) return;
 
     // 图像镜像翻转 (通常摄像头读取自带镜像)

@@ -10,10 +10,10 @@
 #include <QJsonArray>
 
 main_win::main_win(QWidget *parent, int user_id, QString username) : QWidget(parent),
-    ui(new Ui::main_win),
-    current_user_id(user_id),
-    current_username(username),
-    current_edit_note_id(-1)
+                                                                     ui(new Ui::main_win),
+                                                                     current_user_id(user_id),
+                                                                     current_username(username),
+                                                                     current_edit_note_id(-1)
 {
     ui->setupUi(this);
     this->setWindowTitle("瞳记");
@@ -148,14 +148,14 @@ void main_win::on_lock_bt_clicked()
         QPushButton *unlockBtn = new QPushButton("点击解锁我的便签", maskWidget);
         unlockBtn->setFixedSize(300, 80);
         unlockBtn->setStyleSheet(
-                    "QPushButton {"
-                    "  background-color: #3b82f6;"
-                    "  color: white;"
-                    "  font-size: 20px;"
-                    "  font-weight: bold;"
-                    "  border-radius: 10px;"
-                    "}"
-                    "QPushButton:hover { background-color: #2563eb; }");
+            "QPushButton {"
+            "  background-color: #3b82f6;"
+            "  color: white;"
+            "  font-size: 20px;"
+            "  font-weight: bold;"
+            "  border-radius: 10px;"
+            "}"
+            "QPushButton:hover { background-color: #2563eb; }");
 
         // 计算居中位置
         int btnX = (maskWidget->width() - unlockBtn->width()) / 2;
@@ -182,7 +182,7 @@ void main_win::on_unlock_clicked()
     // 如果 face_in 验证成功，在它结束或发信号后，您需要去除蒙版
     // 例如监听它发出的 loginSuccessful 信号
     connect(fi, &face_in::loginSuccessful, this, [=]()
-    {
+            {
         if (maskWidget) {
             maskWidget->hide();
         }
@@ -317,15 +317,16 @@ void main_win::on_dateTimeEdit_dateChanged(const QDate &date)
 
     if (res.value("status").toString() == "success")
     {
-        QJsonArray notesList = res.value("notes").toArray();// 这里的 notesList 是服务端根据日期过滤后的结果
+        QJsonArray notesList = res.value("notes").toArray(); // 这里的 notesList 是服务端根据日期过滤后的结果
         int row = 0;
-        for(int i = 0; i < notesList.size(); ++i) {
-            QJsonObject itemObj = notesList[i].toObject();// 每个 itemObj 里包含 note_id、title、update_time 字段
+        for (int i = 0; i < notesList.size(); ++i)
+        {
+            QJsonObject itemObj = notesList[i].toObject(); // 每个 itemObj 里包含 note_id、title、update_time 字段
             int note_id = itemObj.value("note_id").toInt();
             QString title = itemObj.value("title").toString();
             QString time = itemObj.value("update_time").toString();
 
-            ui->tableWidget->insertRow(row);// 每次插入新行
+            ui->tableWidget->insertRow(row); // 每次插入新行
             QTableWidgetItem *item = new QTableWidgetItem(title + "\n" + time);
             item->setData(Qt::UserRole, note_id);
             ui->tableWidget->setItem(row, 0, item);
